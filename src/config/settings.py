@@ -6,7 +6,7 @@ class Settings(BaseSettings):
         "postgresql+asyncpg://postgres:postgres@postgres:5432/leads"
     )
     redis_url: str = "redis://redis:6379/0"
-    jwt_secret: str = "change-me"
+    jwt_secret: str = "dev-jwt-secret-please-change-12345"
     jwt_algorithm: str = "HS256"
 
     model_config = SettingsConfigDict(

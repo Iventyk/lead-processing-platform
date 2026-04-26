@@ -9,7 +9,7 @@ router = APIRouter(tags=["landings"])
 
 @router.post("/lead")
 async def create_lead(
-    lead: LeadIn, token_affiliate_id: str = Depends(get_current_affiliate_id)
+    lead: LeadIn, token_affiliate_id: int = Depends(get_current_affiliate_id)
 ) -> dict:
     if lead.affiliate_id != token_affiliate_id:
         raise HTTPException(

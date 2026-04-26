@@ -19,7 +19,7 @@ async def get_leads(
     date_from: date = Query(...),
     date_to: date = Query(...),
     group: GroupBy = Query(...),
-    affiliate_id: str = Depends(get_current_affiliate_id),
+    affiliate_id: int = Depends(get_current_affiliate_id),
     session: AsyncSession = Depends(get_session),
 ) -> dict:
     if date_from > date_to:
