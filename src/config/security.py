@@ -30,9 +30,7 @@ async def get_current_affiliate_id(
         )
 
     result = await session.execute(
-        select(Affiliate.id).where(
-            cast(Affiliate.id, Integer) == affiliate_id
-        )
+        select(Affiliate.id).where(cast(Affiliate.id, Integer) == affiliate_id)
     )
 
     if result.scalar_one_or_none() is None:

@@ -29,8 +29,12 @@ class Lead(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone: Mapped[str] = mapped_column(String(32), nullable=False)
     country: Mapped[str] = mapped_column(String(2), nullable=False)
-    offer_id: Mapped[int] = mapped_column(ForeignKey("offers.id"), nullable=False)
-    affiliate_id: Mapped[int] = mapped_column(ForeignKey("affiliates.id"), nullable=False)
+    offer_id: Mapped[int] = mapped_column(
+        ForeignKey("offers.id"), nullable=False
+    )
+    affiliate_id: Mapped[int] = mapped_column(
+        ForeignKey("affiliates.id"), nullable=False
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
