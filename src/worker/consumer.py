@@ -14,7 +14,7 @@ def dedup_key(payload: dict) -> str:
     return "lead_dedup:" + hashlib.sha256(raw.encode()).hexdigest()
 
 
-async def process_message(payload: dict) -> None:
+async def process_message(payload: dict) -> bool:
     async with SessionLocal() as session:
         offer_exists = await session.execute(
             select(Offer.id).where(
@@ -30,11 +30,12 @@ async def process_message(payload: dict) -> None:
             offer_exists.scalar_one_or_none() is None
             or aff_exists.scalar_one_or_none() is None
         ):
-            return
+            return False
 
         lead = Lead(**payload)
         session.add(lead)
         await session.commit()
+        return True
 
 
 async def run_worker() -> None:
@@ -49,8 +50,9 @@ async def run_worker() -> None:
         key = dedup_key(payload)
         if await redis.get(key):
             continue
-        await redis.set(key, "1", ex=600)
-        await process_message(payload)
+        is_processed = await process_message(payload)
+        if is_processed:
+            await redis.set(key, "1", ex=600)
 
 
 if __name__ == "__main__":
