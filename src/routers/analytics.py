@@ -22,6 +22,15 @@ async def get_leads(
     affiliate_id: str = Depends(get_current_affiliate_id),
     session: AsyncSession = Depends(get_session),
 ) -> dict:
+    if date_from > date_to:
+        return {
+            "affiliate_id": affiliate_id,
+            "date_from": date_from.isoformat(),
+            "date_to": date_to.isoformat(),
+            "group": group.value,
+            "items": [],
+        }
+
     dt_from = datetime.combine(date_from, time.min)
     dt_to = datetime.combine(date_to, time.max)
 
