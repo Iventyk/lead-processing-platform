@@ -9,6 +9,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7
@@ -18,7 +23,8 @@ services:
   migrate:
     build: .
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     command: ["alembic", "upgrade", "head"]
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/leads
@@ -26,9 +32,12 @@ services:
   landings:
     build: .
     depends_on:
-      - postgres
-      - redis
-      - migrate
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
     command: ["uvicorn", "src.landings_app:app", "--host", "0.0.0.0", "--port", "8001"]
     ports:
       - "8001:8001"
@@ -40,9 +49,12 @@ services:
   core:
     build: .
     depends_on:
-      - postgres
-      - redis
-      - migrate
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
     command: ["uvicorn", "src.core_app:app", "--host", "0.0.0.0", "--port", "8002"]
     ports:
       - "8002:8002"
@@ -54,9 +66,12 @@ services:
   worker:
     build: .
     depends_on:
-      - postgres
-      - redis
-      - migrate
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
     command: ["python", "-m", "src.worker.consumer"]
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/leads

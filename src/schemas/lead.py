@@ -13,8 +13,8 @@ class LeadIn(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     phone: str = Field(min_length=5, max_length=32)
     country: str = Field(pattern=r"^[A-Z]{2}$")
-    offer_id: str = Field(min_length=1, max_length=64)
-    affiliate_id: str = Field(min_length=1, max_length=64)
+    offer_id: int
+    affiliate_id: int
 
 
 class LeadOut(BaseModel):
@@ -22,6 +22,6 @@ class LeadOut(BaseModel):
     name: str
     phone: str
     country: str
-    offer_id: str
-    affiliate_id: str
+    offer_id: int
+    affiliate_id: int
     created_at: datetime

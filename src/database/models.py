@@ -11,14 +11,14 @@ class Base(DeclarativeBase):
 class Offer(Base):
     __tablename__ = "offers"
 
-    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
 class Affiliate(Base):
     __tablename__ = "affiliates"
 
-    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
@@ -29,12 +29,8 @@ class Lead(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone: Mapped[str] = mapped_column(String(32), nullable=False)
     country: Mapped[str] = mapped_column(String(2), nullable=False)
-    offer_id: Mapped[str] = mapped_column(
-        ForeignKey("offers.id"), nullable=False
-    )
-    affiliate_id: Mapped[str] = mapped_column(
-        ForeignKey("affiliates.id"), nullable=False
-    )
+    offer_id: Mapped[int] = mapped_column(ForeignKey("offers.id"), nullable=False)
+    affiliate_id: Mapped[int] = mapped_column(ForeignKey("affiliates.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
