@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: leads
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  migrate:
+    build: .
+    depends_on:
+      - postgres
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/leads
+
+  landings:
+    build: .
+    depends_on:
+      - postgres
+      - redis
+      - migrate
+    command: ["uvicorn", "src.landings_app:app", "--host", "0.0.0.0", "--port", "8001"]
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/leads
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: super-secret
+
+  core:
+    build: .
+    depends_on:
+      - postgres
+      - redis
+      - migrate
+    command: ["uvicorn", "src.core_app:app", "--host", "0.0.0.0", "--port", "8002"]
+    ports:
+      - "8002:8002"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/leads
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: super-secret
+
+  worker:
+    build: .
+    depends_on:
+      - postgres
+      - redis
+      - migrate
+    command: ["python", "-m", "src.worker.consumer"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/leads
+      REDIS_URL: redis://redis:6379/0
+
+volumes:
+  pgdata:
