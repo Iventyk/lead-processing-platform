@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import date, datetime, time
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select
+from sqlalchemy import Integer, cast, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -36,7 +36,7 @@ async def get_leads(
 
     query = (
         select(Lead)
-        .where(Lead.affiliate_id == affiliate_id)
+        .where(cast(Lead.affiliate_id, Integer) == affiliate_id)
         .where(Lead.created_at >= dt_from)
         .where(Lead.created_at <= dt_to)
         .options(selectinload(Lead.offer))

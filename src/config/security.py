@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 from jwt import InvalidTokenError
-from sqlalchemy import String, cast, select
+from sqlalchemy import Integer, cast, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config.settings import settings
@@ -23,7 +23,6 @@ async def get_current_affiliate_id(
             algorithms=[settings.jwt_algorithm],
         )
         affiliate_id = int(payload["id"])
-        affiliate_id_lookup = str(affiliate_id)
     except (InvalidTokenError, KeyError, TypeError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -32,7 +31,7 @@ async def get_current_affiliate_id(
 
     result = await session.execute(
         select(Affiliate.id).where(
-            cast(Affiliate.id, String) == affiliate_id_lookup
+            cast(Affiliate.id, Integer) == affiliate_id
         )
     )
 

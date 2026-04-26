@@ -2,7 +2,7 @@ import asyncio
 import hashlib
 import json
 
-from sqlalchemy import select
+from sqlalchemy import Integer, cast, select
 
 from src.config.redis import QUEUE_NAME, get_redis
 from src.database.models import Affiliate, Lead, Offer
@@ -17,10 +17,14 @@ def dedup_key(payload: dict) -> str:
 async def process_message(payload: dict) -> None:
     async with SessionLocal() as session:
         offer_exists = await session.execute(
-            select(Offer.id).where(Offer.id == payload["offer_id"])
+            select(Offer.id).where(
+                cast(Offer.id, Integer) == payload["offer_id"]
+            )
         )
         aff_exists = await session.execute(
-            select(Affiliate.id).where(Affiliate.id == payload["affiliate_id"])
+            select(Affiliate.id).where(
+                cast(Affiliate.id, Integer) == payload["affiliate_id"]
+            )
         )
         if (
             offer_exists.scalar_one_or_none() is None
