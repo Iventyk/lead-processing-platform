@@ -25,4 +25,3 @@ class LeadOut(BaseModel):
     offer_id: str
     affiliate_id: str
     created_at: datetime
-    

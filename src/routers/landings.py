@@ -12,7 +12,9 @@ async def create_lead(
     lead: LeadIn, token_affiliate_id: str = Depends(get_current_affiliate_id)
 ) -> dict:
     if lead.affiliate_id != token_affiliate_id:
-        raise HTTPException(status_code=403, detail="affiliate_id mismatch with bearer token")
+        raise HTTPException(
+            status_code=403, detail="affiliate_id mismatch with bearer token"
+        )
 
     redis = get_redis()
     await enqueue_lead(redis, lead)

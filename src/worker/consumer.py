@@ -10,7 +10,7 @@ from src.database.session import SessionLocal
 
 
 def dedup_key(payload: dict) -> str:
-    raw = f"{payload['name']}|{payload['phone']}|{payload['offer_id']}|{payload['affiliate_id']}"
+    raw = f"{payload['name']}|{payload['phone']}|{payload['offer_id']}|{payload['affiliate_id']}"  # noqa
     return "lead_dedup:" + hashlib.sha256(raw.encode()).hexdigest()
 
 
@@ -22,7 +22,10 @@ async def process_message(payload: dict) -> None:
         aff_exists = await session.execute(
             select(Affiliate.id).where(Affiliate.id == payload["affiliate_id"])
         )
-        if offer_exists.scalar_one_or_none() is None or aff_exists.scalar_one_or_none() is None:
+        if (
+            offer_exists.scalar_one_or_none() is None
+            or aff_exists.scalar_one_or_none() is None
+        ):
             return
 
         lead = Lead(**payload)

@@ -14,4 +14,3 @@ def get_redis() -> Redis:
 
 async def enqueue_lead(redis: Redis, lead: LeadIn) -> None:
     await redis.rpush(QUEUE_NAME, json.dumps(lead.model_dump()))
-    

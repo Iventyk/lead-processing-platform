@@ -51,7 +51,9 @@ async def get_leads(
                 "key": key,
                 "count": len(items),
                 "leads": [
-                    LeadOut.model_validate(lead, from_attributes=True).model_dump()
+                    LeadOut.model_validate(
+                        lead, from_attributes=True
+                    ).model_dump()
                     for lead in items
                 ],
             }
